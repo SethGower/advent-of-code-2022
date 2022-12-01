@@ -1,39 +1,40 @@
 pub fn part_one(input: &str) -> Option<u32> {
-    // let elves: Vec<u32> = input
-    //     .split("\n\n")
-    //     .map(|x| x.split('\n').map(|y| y.parse::<u32>().unwrap()).sum())
-    //     .collect();
-    //
-    // Some(*elves.iter().max().unwrap())
-    let elves: Vec<&str> = input.split("\n\n").collect();
-    let mut calories: Vec<u32> = Vec::new();
-    for elf in elves {
-        calories.push(
-            elf.split('\n')
-                // figure out better error handling. This was panicking on the last line
-                .map(|x| x.parse::<u32>().unwrap_or_default())
-                .sum(),
-        )
-    }
-    Some(*calories.iter().max().unwrap())
+    let elves: Vec<u32> = input
+        .split("\n\n")
+        .map(|x| -> u32 {
+            x.lines()
+                .map(|y| {
+                    if let Ok(num) = y.parse::<u32>() {
+                        num
+                    } else {
+                        0
+                    }
+                })
+                .sum()
+        })
+        .collect::<Vec<u32>>();
 
-    // None
+    Some(*elves.iter().max().unwrap())
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let elves: Vec<&str> = input.split("\n\n").collect();
-    let mut calories: Vec<u32> = Vec::new();
-    for elf in elves {
-        calories.push(
-            elf.split('\n')
-                // figure out better error handling. This was panicking on the last line
-                .map(|x| x.parse::<u32>().unwrap_or_default())
-                .sum(),
-        )
-    }
-    calories.sort();
-    let sum = calories.pop()? + calories.pop()? + calories.pop()?;
-    Some(sum)
+    let mut elves: Vec<u32> = input
+        .split("\n\n")
+        .map(|x| -> u32 {
+            x.lines()
+                .map(|y| {
+                    if let Ok(num) = y.parse::<u32>() {
+                        num
+                    } else {
+                        0
+                    }
+                })
+                .sum()
+        })
+        .collect::<Vec<u32>>();
+
+    elves.sort_by(|a, b| b.cmp(a));
+    Some(*&elves[0..3].iter().sum::<u32>())
 }
 
 fn main() {
