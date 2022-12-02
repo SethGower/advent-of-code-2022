@@ -1,7 +1,21 @@
+use std::cmp::Ord;
+use std::cmp::Ordering;
+#[derive(Eq, PartialEq)]
 enum Choice {
     Rock,
     Paper,
     Scissors,
+}
+
+impl Ord for Choice {
+    fn cmp(&self, other: &Self) -> Ordering {
+        Ordering::Less
+    }
+}
+impl PartialOrd for Choice {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        None
+    }
 }
 enum Player {
     Left,
