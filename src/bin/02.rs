@@ -1,26 +1,36 @@
 use std::cmp::Ord;
 use std::cmp::Ordering;
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Copy, Clone, Debug, Ord)]
 enum Choice {
-    Rock,
-    Paper,
-    Scissors,
+    Rock = 1,
+    Paper = 2,
+    Scissors = 3,
 }
 
-impl Ord for Choice {
-    fn cmp(&self, other: &Self) -> Ordering {
-        Ordering::Less
-    }
-}
 impl PartialOrd for Choice {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        None
+        if *self == *other {
+            Some(Ordering::Equal)
+        } else if *self == Choice::Rock && *other == Choice::Scissors {
+            Some(Ordering::Greater)
+        } else if *self == Choice::Scissors && *other == Choice::Paper {
+            Some(Ordering::Greater)
+        } else if *self == Choice::Rock && *other == Choice::Paper {
+            Some(Ordering::Less)
+        } else if *other == Choice::Rock && *self == Choice::Scissors {
+            Some(Ordering::Less)
+        } else if *other == Choice::Scissors && *self == Choice::Paper {
+            Some(Ordering::Less)
+        } else if *other == Choice::Rock && *self == Choice::Paper {
+            Some(Ordering::Greater)
+        } else {
+            None
+        }
     }
 }
-enum Player {
-    Left,
-    Right,
-}
+
+
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
 struct Game {
     left: Option<Choice>,
     right: Option<Choice>,
@@ -47,17 +57,33 @@ impl Game {
             "Z" => Some(Choice::Scissors),
             _ => None,
         };
+        if let (Some(left), Some(right)) = (&rv.left, &rv.right) {
+            rv.left_score = *left as u32;
+            rv.right_score = *right as u32;
+            if *left == *right {
+                rv.left_score += 3;
+                rv.right_score += 3;
+            } else if *left > *right {
+                rv.left_score += 6;
+            } else if *left < *right {
+                rv.right_score += 6;
+            }
+        }
         Some(rv)
     }
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    // let mut games : Vec<Game> = input.lines().map(|x| {
-    //     let x = x.split(' ');
-    //     let mut game : Game = Game::new(x.next().unwrap(), x.next().unwrap()).unwrap();
+    let mut sum = 0;
+    let lines: Vec<&str> = input.lines().collect();
 
-    // })
-    None
+    for line in lines {
+        let mut line = line.split(' ');
+        let game = Game::new(line.next()?, line.next()?)?;
+        sum += game.right_score;
+    }
+
+    Some(sum)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -77,7 +103,7 @@ mod tests {
     #[test]
     fn test_part_one() {
         let input = advent_of_code::read_file("examples", 2);
-        assert_eq!(part_one(&input), None);
+        assert_eq!(part_one(&input), Some(15));
     }
 
     #[test]
