@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use regex::Regex;
 #[derive(Debug)]
 struct Elf {
@@ -8,6 +7,16 @@ struct Elf {
 impl Elf {
     fn subset(&self, other: &Self) -> bool {
         self.left >= other.left && self.right <= other.right
+    }
+    fn overlap(&self, other: &Self) -> bool {
+        let rv: bool;
+        if self.left < other.left {
+            // the two are in ascending order
+            rv = self.right >= other.left;
+        } else {
+            rv = self.left <= other.right;
+        }
+        rv
     }
 }
 pub fn part_one(input: &str) -> Option<u32> {
@@ -30,31 +39,19 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let overlaps = input
-        .lines()
-        .filter(|line| {
-            let mut sets: Vec<HashSet<u32>> = vec![];
-            for elf in line.split(',') {
-                let mut elf = elf.split('-');
-                let left = elf.next().unwrap().parse::<u32>().unwrap();
-                let right = elf.next().unwrap().parse::<u32>().unwrap();
-                let mut set: HashSet<u32> = HashSet::new();
-                for j in left..=right {
-                    set.insert(j);
-                }
-                sets.push(set);
-            }
-            if sets
-                .get(0)
-                .unwrap()
-                .intersection(sets.get(1).unwrap())
-                .count()
-                > 0
-            {
-                true
-            } else {
-                false
-            }
+    let re = Regex::new(r"(\d+)-(\d+),\s*(\d+)-(\d+)").ok()?;
+    let overlaps = re
+        .captures_iter(input)
+        .filter(|cap| {
+            let left = Elf {
+                left: cap[1].parse::<u32>().unwrap(),
+                right: cap[2].parse::<u32>().unwrap(),
+            };
+            let right = Elf {
+                left: cap[3].parse::<u32>().unwrap(),
+                right: cap[4].parse::<u32>().unwrap(),
+            };
+            left.overlap(&right)
         })
         .count();
     Some(overlaps as u32)
