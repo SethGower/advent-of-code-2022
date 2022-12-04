@@ -9,17 +9,12 @@ impl Elf {
         self.left >= other.left && self.right <= other.right
     }
     fn overlap(&self, other: &Self) -> bool {
-        let rv: bool;
-        if self.left < other.left {
-            // the two are in ascending order
-            rv = self.right >= other.left;
-        } else {
-            rv = self.left <= other.right;
-        }
-        rv
+        self.left < other.left && self.right >= other.left
+            || self.left >= other.left && self.left <= other.right
     }
 }
 pub fn part_one(input: &str) -> Option<u32> {
+    // regex to extract the numbers in each of the lines
     let re = Regex::new(r"(\d+)-(\d+),\s*(\d+)-(\d+)").ok()?;
     let overlaps = re
         .captures_iter(input)
@@ -39,10 +34,13 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
+    // regex to extract the numbers in each of the lines
     let re = Regex::new(r"(\d+)-(\d+),\s*(\d+)-(\d+)").ok()?;
     let overlaps = re
         .captures_iter(input)
         .filter(|cap| {
+            // only return the lines that are matching this par of the puzzle, ie the ones that
+            // contain overlapping pairs
             let left = Elf {
                 left: cap[1].parse::<u32>().unwrap(),
                 right: cap[2].parse::<u32>().unwrap(),
