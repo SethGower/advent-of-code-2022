@@ -18,8 +18,8 @@ pub fn part_one(input: &str) -> Option<u32> {
     // regex to extract the numbers in each of the lines
     let re = Regex::new(r"(\d+)-(\d+),\s*(\d+)-(\d+)").ok()?;
     let overlaps = re
-        .captures(input)
-        .par_iter() // parallelizes the iterator with rayon
+        .captures_iter(input)
+        // .par_iter() // parallelizes the iterator with rayon
         .filter(|cap| {
             let left = Elf {
                 left: cap[1].parse::<u32>().unwrap(),
@@ -39,8 +39,8 @@ pub fn part_two(input: &str) -> Option<u32> {
     // regex to extract the numbers in each of the lines
     let re = Regex::new(r"(\d+)-(\d+),\s*(\d+)-(\d+)").ok()?;
     let overlaps = re
-        .captures(input)
-        .par_iter() // parallelizes the iterator with rayon
+        .captures_iter(input)
+        // .par_iter() // parallelizes the iterator with rayon
         .filter(|cap| {
             // only return the lines that are matching this par of the puzzle, ie the ones that
             // contain overlapping pairs
